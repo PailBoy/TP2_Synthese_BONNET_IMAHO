@@ -1,7 +1,3 @@
-//
-// Created by Jeen Yuhs on 12/12/2024.
-//
-
 #include "adresse.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +12,7 @@
 const char *node = "localhost"; // Chercher automatiquement localhost
 const char *service = "69";     // Port TFTP (69)
 
-void adresse_init() {
+char adresse_init() {
     struct addrinfo hints, *res, *p;
 
     // Initialisation de la structure hints
@@ -25,7 +21,9 @@ void adresse_init() {
     hints.ai_socktype = SOCK_DGRAM; // TFTP utilise UDP
     hints.ai_flags = 0; // Ne pas utiliser AI_PASSIVE
     hints.ai_protocol = IPPROTO_UDP;
+
     int status = getaddrinfo(node, service, &hints, &res);
+
 
     printf("Résultats pour le serveur TFTP local :\n");
     for (p = res; p != NULL; p = p->ai_next) {
@@ -33,8 +31,9 @@ void adresse_init() {
         struct sockaddr_in *addr = (struct sockaddr_in *)p->ai_addr;
         inet_ntop(AF_INET, &addr->sin_addr, addr_str, sizeof(addr_str));
         printf("Adresse : %s\n", addr_str);
-
+        return (char) addr_str;
     }
+
     // Libération de la mémoire
     freeaddrinfo(res);
 }
