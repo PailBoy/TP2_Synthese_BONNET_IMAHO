@@ -1,39 +1,30 @@
 #include "adresse.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
 
-// Définition des variables globales
-const char *node = "localhost"; // Chercher automatiquement localhost
+
+const char *node = "localhost"; // Adresse du serveur TFTP
 const char *service = "69";     // Port TFTP (69)
 
-char adresse_init() {
-    struct addrinfo hints, *res, *p;
+void adresse_init() {
+    struct addrinfo *res = get_server_address(node, service);
+    int fd = create_udp_socket(res);
 
-    // Initialisation de la structure hints
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET; // Utiliser IPv4 uniquement
-    hints.ai_socktype = SOCK_DGRAM; // TFTP utilise UDP
-    hints.ai_flags = 0; // Ne pas utiliser AI_PASSIVE
-    hints.ai_protocol = IPPROTO_UDP;
+    // Préparer le buffer pour la requête RRQ
 
-    int status = getaddrinfo(node, service, &hints, &res);
+    char buffer[TRAME_LENGTH];
+    const char *filename = "test.txt";
+    const char *mode = "octet";
 
-
-    printf("Résultats pour le serveur TFTP local :\n");
-    for (p = res; p != NULL; p = p->ai_next) {
-        char addr_str[INET_ADDRSTRLEN];
-        struct sockaddr_in *addr = (struct sockaddr_in *)p->ai_addr;
-        inet_ntop(AF_INET, &addr->sin_addr, addr_str, sizeof(addr_str));
-        printf("Adresse : %s\n", addr_str);
-        return (char) addr_str;
+    // Construire la requête RRQ
+    size_t packet_size = build_rrq_request(buffer, filename, mode);
+    // Afficher le buffer pour vérifier
+    printf("Buffer à envoyer : ");
+    for (size_t i = 0; i < packet_size; i++) {
+        printf("%02X ", (unsigned char)buffer[i]);
     }
+    printf("\n");
+    ssize_t bytes_sent = send_udp_message(fd, buffer, packet_size, res);
 
-    // Libération de la mémoire
+
     freeaddrinfo(res);
+
 }
