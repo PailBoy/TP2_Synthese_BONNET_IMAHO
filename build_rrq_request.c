@@ -1,7 +1,7 @@
 #include "build_rrq_request.h"
 
 
-// Fonction pour construire une requête RRQ
+
 
 size_t build_rrq_request(char *buffer, const char *filename, const char *mode) {
     size_t offset = 0;
@@ -15,7 +15,7 @@ size_t build_rrq_request(char *buffer, const char *filename, const char *mode) {
     offset += strlen(filename);
     buffer[offset++] = '\0';
 
-    // Mode de transfert (octet/netascii), suivi de '\0'
+    // Mode de transfert
     strcpy(buffer + offset, mode);
     offset += strlen(mode);
     buffer[offset++] = '\0';
