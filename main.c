@@ -1,5 +1,8 @@
+#include <stdio.h>
 #include "adresse.h"
 
-char main(void) {
-    return adresse_init();
+int main() {
+    adresse_init();
+    printf("Terminé.\n");
+    return 0;
 }
